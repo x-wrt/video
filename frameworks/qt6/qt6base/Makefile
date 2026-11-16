@@ -72,10 +72,13 @@ HOST_BUILD_DEPENDS:=pcre2/host libdouble-conversion/host
 # FEATURE_libudev is forced on whenever UDEV is enabled, FEATURE_kms whenever
 # DRM is enabled. Neither is guaranteed through the DEPENDS of the selected
 # subpackages.
-PKG_BUILD_DEPENDS:=qt6base/host BUILD_qt6base-gui_UDEV:libudev-zero BUILD_qt6base-gui_DRM:libdrm
+PKG_BUILD_DEPENDS:=qt6base/host BUILD_qt6base-gui_UDEV:libudev-zero PACKAGE_qt6base-gui&&BUILD_qt6base-gui_DRM:libdrm
+
+# The DRM option is independent of GUI selection to avoid Kconfig recursion.
+QT6BASE_DRM_ENABLED:=$(and $(CONFIG_PACKAGE_qt6base-gui),$(CONFIG_BUILD_qt6base-gui_DRM))
 
 # KMS-based EGLFS integrations require both OpenGL ES and DRM
-QT6BASE_EGLFS_KMS:=$(and $(CONFIG_BUILD_qt6base-gui_OPENGL_OPENGLES2),$(CONFIG_BUILD_qt6base-gui_DRM))
+QT6BASE_EGLFS_KMS:=$(and $(CONFIG_BUILD_qt6base-gui_OPENGL_OPENGLES2),$(QT6BASE_DRM_ENABLED))
 
 QT6BASE_QPA_DEFAULT_PLATFORM:=$(strip \
   $(if $(CONFIG_BUILD_qt6base-gui_QPA_DEFAULT_EGLFS),eglfs) \
@@ -341,8 +344,8 @@ CMAKE_OPTIONS += \
 	-DFEATURE_eglfs_egldevice=$(if $(QT6BASE_EGLFS_KMS),ON,OFF) \
 	-DFEATURE_eglfs_vsp2=OFF \
 	-DFEATURE_gbm=$(if $(QT6BASE_EGLFS_KMS),ON,OFF) \
-	-DFEATURE_kms=$(if $(CONFIG_BUILD_qt6base-gui_DRM),ON,OFF) \
-	-DFEATURE_drm_atomic=$(if $(CONFIG_BUILD_qt6base-gui_DRM),ON,OFF) \
+	-DFEATURE_kms=$(if $(QT6BASE_DRM_ENABLED),ON,OFF) \
+	-DFEATURE_drm_atomic=$(if $(QT6BASE_DRM_ENABLED),ON,OFF) \
 	-DFEATURE_linuxfb=$(if $(CONFIG_PACKAGE_qt6base-plugin-platforms-linuxfb),ON,OFF) \
 	-DFEATURE_vnc=$(if $(CONFIG_PACKAGE_qt6base-plugin-platforms-vnc),ON,OFF) \
 	-DFEATURE_wayland=OFF \
