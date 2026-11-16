@@ -1,6 +1,8 @@
+# Keep DRM independent of qt6base-gui: the platform plugins select the GUI
+# package and inherit a DRM-conditional dependency from libdrm. The Makefile
+# only enables DRM features when the GUI package is selected.
 config BUILD_qt6base-gui_DRM
     bool "Include DRM support"
-    depends on PACKAGE_qt6base-gui
     default y
 
 config BUILD_qt6base-gui_UDEV
