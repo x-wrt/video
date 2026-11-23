@@ -46,10 +46,13 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_qt5base-plugin-platforms-linuxfb \
 	CONFIG_PACKAGE_qt5base-plugin-input-libinput \
 	CONFIG_BUILD_qt5base-core_INOTIFY \
+	CONFIG_BUILD_qt5base-gui_DRM \
 	CONFIG_PACKAGE_qt5base-plugin-platforms-eglfs \
 #	CONFIG_PACKAGE_qt5base-gl \
 #	CONFIG_PACKAGE_qt5base-plugin-imageformats-png \
 #	CONFIG_PACKAGE_qt5base-plugin-platforms-minimalegl \
+
+QT5BASE_DRM_ENABLED:=$(and $(CONFIG_PACKAGE_qt5base-gui),$(CONFIG_BUILD_qt5base-gui_DRM))
 
 # Do not use sstrip for QT5. When sstrip is used the QT5 plugin loading does
 # not work, because of QT''s internal elf parser, see
@@ -378,8 +381,8 @@ define Build/Configure
 			$(if $(CONFIG_PACKAGE_qt5base-plugin-platforms-linuxfb),--qpa=linuxfb,) \
 			--directfb=no \
 			--eglfs=$(if $(CONFIG_BUILD_qt5base-gui_OPENGL_OPENGLES2),yes,no) \
-			--gbm=$(if $(CONFIG_BUILD_qt5base-gui_DRM),yes,no) \
-			--kms=$(if $(CONFIG_BUILD_qt5base-gui_DRM),yes,no) \
+			--gbm=$(if $(QT5BASE_DRM_ENABLED),yes,no) \
+			--kms=$(if $(QT5BASE_DRM_ENABLED),yes,no) \
 			--linuxfb=$(if $(CONFIG_PACKAGE_qt5base-plugin-platforms-linuxfb),yes,no) \
 			--xcb=no \
 			--libudev=$(if $(CONFIG_PACKAGE_qt5base-input-autodiscovery),yes,no) \

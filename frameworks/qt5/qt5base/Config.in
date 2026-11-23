@@ -10,9 +10,10 @@ config BUILD_qt5base-network_SSL
     depends on PACKAGE_qt5base-network
     default y
 
+# Platform plugins select qt5base-gui and inherit a DRM-conditional
+# dependency from libdrm. Keep this option independent of GUI selection.
 config BUILD_qt5base-gui_DRM
     bool "Include DRM support"
-    depends on PACKAGE_qt5base-gui
     default y
 
 choice
